@@ -209,3 +209,16 @@ done
 
 # Call main setup before Docker Compose logic
 main
+
+echo "Starting services..."
+
+# Start services
+$DOCKER_COMPOSE up -d --build notebook
+$DOCKER_COMPOSE up -d --build app
+$DOCKER_COMPOSE up -d --build torchserve
+
+echo "✅ Services started successfully!"
+echo "Access services at:"
+echo "- Jupyter Notebook: http://localhost:8888"
+echo "- Dashboard App: http://localhost:8050"
+echo "- TorchServe API: http://localhost:8080"
