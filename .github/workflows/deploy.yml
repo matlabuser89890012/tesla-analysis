@@ -1,0 +1,33 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login registry.example.com -u ${{ secrets.REGISTRY_USER }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t registry.example.com/tesla-stock-analysis:latest .
+
+      - name: Push image
+        run: docker push registry.example.com/tesla-stock-analysis:latest
+
+      - name: Set up Kubeconfig
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "latest"
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/tesla-deployment.yaml

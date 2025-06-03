@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tesla
+description: Tesla Stock Analysis Platform
+type: application
+version: 0.1.0
+appVersion: "{{ .Chart.AppVersion }}"

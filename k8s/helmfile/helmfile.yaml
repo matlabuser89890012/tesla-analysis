@@ -1,0 +1,15 @@
+environments:
+  dev:
+    values:
+      - environments/dev.yaml
+  prod:
+    values:
+      - environments/prod.yaml
+
+releases:
+  - name: tesla
+    namespace: {{ .Environment.Name }}
+    chart: ../helm
+    version: ">=0.1.0"
+    values:
+      - ../helmfile/values/{{ .Environment.Name }}-values.yaml

@@ -1,0 +1,102 @@
+{
+  // Python configuration
+  "python.defaultInterpreterPath": "${command:python.interpreterPath}",
+  "python.envFile": "${workspaceFolder}/.env",
+  // Add workspace folder to PYTHONPATH
+  "terminal.integrated.env.linux": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  "terminal.integrated.env.osx": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  // Linting and formatting
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=100",
+    "--ignore=E203,W503"
+  ],
+  "python.formatting.provider": "none",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.rulers": [
+      100
+    ]
+  },
+  "isort.args": [
+    "--profile",
+    "black"
+  ],
+  // Testing
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestArgs": [
+    "tests",
+    "--no-cov"
+  ],
+  // Docker and YAML
+  "docker.languageserver.formatter.enable": true,
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*",
+    "https://json.schemastore.org/docker-compose.json": "docker-compose.yml",
+    "kubernetes": [
+      "k8s/*.yaml",
+      "tesla-deployment.yaml"
+    ]
+  },
+  // File associations and exclusions
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/.pytest_cache": true,
+    "**/.coverage": true,
+    "**/.mypy_cache": true
+  },
+  "files.associations": {
+    "*.yml": "yaml",
+    "*.yaml": "yaml",
+    "Dockerfile*": "dockerfile",
+    "requirements*.txt": "pip-requirements"
+  },
+  // Jupyter settings
+  "jupyter.notebookFileRoot": "${workspaceFolder}",
+  "jupyter.askForKernelRestart": false,
+  "jupyter.exportWithOutputEnabled": true,
+  // GitLens
+  "gitlens.codeLens.enabled": true,
+  // GPU and performance-related settings
+  "notebook.displayOrder": [
+    "application/vnd.plotly.v1+json",
+    "application/vnd.jupyter.widget-view+json",
+    "application/vnd.code.notebook.stdout",
+    "application/vnd.code.notebook.stderr",
+    "text/html",
+    "image/svg+xml",
+    "image/png",
+    "image/jpeg",
+    "text/plain"
+  ],
+  // Editor performance optimizations
+  "editor.suggest.showWords": false, // Disable showing words in suggestions
+  "editor.wordBasedSuggestions": "off", // Disable word-based suggestions
+  "search.exclude": {
+    "**/.git": true,
+    "**/__pycache__": true,
+    "**/node_modules": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true
+  },
+  "azureTerraform.checkTerraformCmd": false,
+  "DockerRun.DisableDockerrc": true
+}

@@ -1,0 +1,124 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Run Main Module",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/codes/main.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Prefect Flow Debug",
+      "type": "python",
+      "request": "launch",
+      "module": "prefect",
+      "args": [
+        "run",
+        "flow",
+        "-p",
+        "${workspaceFolder}/codes/flows/your_flow.py"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: main.py",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/codes/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "FastAPI (Uvicorn)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "codes.main:api",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8050",
+        "--reload"
+      ],
+      "jinja": true,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Jupyter Notebook",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/analysis_notebook.ipynb",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Docker: Attach to Notebook Container",
+      "type": "docker",
+      "request": "attach",
+      "platform": "python",
+      "containerName": "tesla-stock-analysis-notebook-1"
+    },
+    {
+      "name": "Docker: Attach to App Container",
+      "type": "docker",
+      "request": "attach",
+      "platform": "python",
+      "containerName": "tesla-stock-analysis-app-1"
+    },
+    {
+      "name": "Python: Remote Attach (Docker)",
+      "type": "python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "/app"
+        }
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "Python: GPU Tests",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/codes/check_gpu.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "TorchServe: Run Client",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/codes/torchserve_client.py",
+      "console": "integratedTerminal",
+      "args": ["--model", "tsla", "--url", "http://localhost:8080/predictions/tsla"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Server/Client",
+      "configurations": ["FastAPI (Uvicorn)", "Python: GPU Tests"]
+    }
+  ]
+}

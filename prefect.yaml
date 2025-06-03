@@ -1,0 +1,29 @@
+version: 2.0
+
+deployments:
+  - name: tesla-dev
+    entrypoint: codes/flows/main_flow.py:main_flow
+    parameters:
+      run_mode: dev
+    work_pool:
+      name: default-agent-pool
+    schedule:
+      interval: 3600
+
+  - name: tesla-prod
+    entrypoint: codes/flows/main_flow.py:main_flow
+    parameters:
+      run_mode: prod
+    work_pool:
+      name: default-agent-pool
+    schedule:
+      cron: "0 */6 * * *"
+
+infrastructure:
+  type: process
+  env:
+    NVIDIA_VISIBLE_DEVICES: all
+    CUDA_VISIBLE_DEVICES: 0
+
+storage:
+  block: s3/my-tesla-storage

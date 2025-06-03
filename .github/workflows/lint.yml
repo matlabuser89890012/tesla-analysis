@@ -1,0 +1,17 @@
+name: Lint Code
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install black flake8 mypy
+      - name: Run Black
+        run: black --check codes
+      - name: Run Flake8
+        run: flake8 codes
+      - name: Run MyPy
+        run: mypy codes

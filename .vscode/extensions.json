@@ -1,0 +1,46 @@
+{
+  "recommendations": [
+    // Python core extensions
+    "ms-python.python",                
+    "ms-toolsai.jupyter",             
+    "ms-python.black-formatter",      
+    "ms-python.flake8",               
+    "ms-python.vscode-pylance",       // Python language server
+    "ms-python.isort",                // Import sorting
+    
+    // Docker and K8s support
+    "ms-azuretools.vscode-docker",    
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "redhat.vscode-yaml",             
+    
+    // Data Science extensions
+    "ms-toolsai.vscode-ai",          // Machine learning tools
+    "ms-toolsai.vscode-ai-remote",   // Remote machine learning
+    "ms-toolsai.vscode-pytorch-profiler", // PyTorch profiling tools
+    
+    // Git tools
+    "eamodio.gitlens",                
+    "mhutchie.git-graph",             
+    "github.vscode-pull-request-github",
+    
+    // Documentation and code quality
+    "njpwerner.autodocstring",        
+    "streetsidesoftware.code-spell-checker", // Spell checking
+    "davidanson.vscode-markdownlint", // Markdown linting
+    
+    // Remote development
+    "ms-vscode-remote.remote-containers",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-wsl",
+    
+    // Testing tools
+    "littlefoxteam.vscode-python-test-adapter", // Python test explorer
+    "ryanluker.vscode-coverage-gutters", // Test coverage visualization
+    
+    // Useful utilities
+    "esbenp.prettier-vscode",         
+    "gruntfuggly.todo-tree",          // Highlight TODOs
+    "wayou.vscode-todo-highlight",    // Highlight TODOs in different colors
+    "visualstudioexptteam.vscodeintellicode" // AI-assisted IntelliSense
+  ]
+}

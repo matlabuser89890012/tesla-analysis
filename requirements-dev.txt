@@ -1,0 +1,37 @@
+# Testing
+pytest>=7.3.0,<7.4.0
+pytest-cov>=4.1.0,<4.2.0
+pytest-xdist>=3.3.0,<3.4.0
+pytest-mock>=3.10.0,<3.11.0
+hypothesis>=6.79.0,<6.80.0
+
+# Linting and formatting
+black>=23.7.0,<23.8.0
+isort>=5.12.0,<5.13.0
+flake8>=6.0.0,<6.2.0
+flake8-docstrings>=1.7.0,<1.8.0
+mypy>=1.5.0,<1.6.0
+bandit>=1.7.5,<1.8.0
+pre-commit>=3.3.0,<3.4.0
+
+# Jupyter and visualization
+ipykernel>=6.23.0,<6.24.0
+notebook>=7.0.0,<7.1.0
+jupyterlab>=4.0.0,<4.1.0
+nbmake>=1.3.0,<1.4.0
+nbstripout>=0.6.0,<0.7.0
+
+# Debugging and development
+ipdb>=0.13.0,<0.14.0
+pip-tools>=7.0.0,<7.1.0
+bump2version>=1.0.0,<1.1.0
+memory-profiler>=0.61.0,<0.62.0
+snakeviz>=2.2.0,<2.3.0
+
+# IDE integration 
+# Limit spyder for compatibility
+spyder>=5.4.0,<5.5.0
+spyder-kernels>=2.4.0,<2.5.0
+
+# Explicitly restrict problematic dependencies
+pycodestyle>=2.9.0,<2.11.0

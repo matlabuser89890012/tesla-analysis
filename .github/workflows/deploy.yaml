@@ -1,0 +1,61 @@
+name: Deploy Tesla Platform
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, prod]
+
+    env:
+      IMAGE_REPO: ghcr.io/<your-org>/tesla
+      VERSION: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+
+      - name: Template Helm chart
+        run: |
+          helm template tesla ./k8s/helm \
+            --set image.tag=${{ env.VERSION }} \
+            --output-dir ./k8s/generated/${{ matrix.environment }}
+
+      - name: Deploy with Helmfile
+        run: |
+          cd k8s/helmfile
+          helmfile -e ${{ matrix.environment }} apply
+
+      - name: Deploy Prefect Flow
+        run: |
+          prefect deployment build codes/flows/main_flow.py:main_flow \
+            -n tesla-${{ matrix.environment }} \
+            -q default \
+            -p run_mode=${{ matrix.environment }} \
+            --apply
+        env:
+          PREFECT_API_KEY: ${{ secrets.PREFECT_API_KEY }}
+
+      - name: Package Helm Chart
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          helm package k8s/helm \
+            --version ${{ env.VERSION }} \
+            --app-version ${{ env.VERSION }} \
+            --destination k8s/helm/packages
+
+      - name: Release Helm Chart
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: k8s/helm/packages/*.tgz

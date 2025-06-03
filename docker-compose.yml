@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  notebook:
+    image: tesla-stock-analysis-notebook:latest
+    build:
+      context: .
+      args:
+        CPU_COUNT: 24
+    # Support both Docker Compose V1 and V2
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+      - JUPYTER_TOKEN="" # Ensure no token is required
+      - JUPYTER_PASSWORD=""
+    ports:
+      - "8888:8888" # Jupyter
+    volumes:
+      - ./codes:/app/codes
+      - ./analysis_notebook.ipynb:/app/analysis_notebook.ipynb
+      - ./requirements.txt:/app/requirements.txt
+      - ./requirements-dev.txt:/app/requirements-dev.txt
+      - ./environment.yml:/app/environment.yml
+    command: >
+      bash -c "chmod -R 777 /app && jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''"
+    shm_size: "4g" # Increase shared memory size for large datasets
+    cpus: "16" # Limit to 16 CPUs for the notebook container
+
+  app:
+    image: tesla-stock-analysis-app:latest
+    build:
+      context: .
+      args:
+        CPU_COUNT: 24
+    # Support both Docker Compose V1 and V2
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+    ports:
+      - "8050:8050" # Your app port (Dash, Flask, etc)
+    volumes:
+      - ./codes:/app/codes
+      - ./environment.yml:/app/environment.yml
+    command: >
+      python3 -m uvicorn codes.main:app --host 0.0.0.0 --port 8050 --reload
+    shm_size: "4g" # Increase shared memory size for large datasets
+    cpus: "16" # Limit to 16 CPUs for the app container
+
+  torchserve:
+    image: pytorch/torchserve:latest
+    # Support both Docker Compose V1 and V2
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    ports:
+      - "8080:8080" # Inference API
+      - "8081:8081" # Management API
+    volumes:
+      - ./codes/models:/home/model-server/model-store
+    command: >
+      torchserve --start --model-store /home/model-server/model-store --models tsla=tsla-model.mar --ts-config /home/model-server/model-store/config.properties
