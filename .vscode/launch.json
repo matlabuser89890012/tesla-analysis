@@ -113,12 +113,53 @@
       "env": {
         "PYTHONPATH": "${workspaceFolder}"
       }
+    },
+    {
+      "name": "Docker: Debug Python in Container",
+      "type": "docker",
+      "request": "launch",
+      "preLaunchTask": "docker-build",
+      "python": {
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/app"
+          }
+        ],
+        "projectType": "general"
+      }
+    },
+    {
+      "name": "WSL: Debug Python",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "windows": {
+        "program": "${workspaceFolder}/codes/main.py"
+      }
     }
   ],
   "compounds": [
     {
       "name": "Server/Client",
       "configurations": ["FastAPI (Uvicorn)", "Python: GPU Tests"]
+    },
+    {
+      "name": "Docker: Full Stack",
+      "configurations": [
+        "Docker: Attach to Notebook Container",
+        "Docker: Attach to App Container",
+        "FastAPI (Uvicorn)"
+      ],
+      "presentation": {
+        "hidden": false,
+        "group": "docker",
+        "order": 1
+      }
     }
   ]
 }

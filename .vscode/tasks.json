@@ -166,6 +166,33 @@
       "windows": {
         "command": ".\\startup.sh"
       }
+    },
+    {
+      "label": "Docker: Build All Images",
+      "type": "shell",
+      "command": "docker compose build --parallel",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Docker: Start WSL Integration",
+      "type": "shell",
+      "command": "wsl.exe docker context use default",
+      "windows": {
+        "command": "wsl.exe -d Ubuntu-22.04 docker context use default"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Restart Docker Desktop",
+      "type": "shell",
+      "windows": {
+        "command": "powershell.exe -Command \"Stop-Process -Name 'Docker Desktop'; Start-Sleep -s 5; Start-Process 'C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe'\""
+      },
+      "problemMatcher": []
     }
   ]
 }

@@ -98,5 +98,23 @@
     "**/.pytest_cache": true
   },
   "azureTerraform.checkTerraformCmd": false,
-  "DockerRun.DisableDockerrc": true
+  "DockerRun.DisableDockerrc": true,
+  // Docker specific settings
+  "docker.amazonEcrRefreshToken": "",
+  "docker.containers.groupBy": "ContainerName",
+  "docker.containers.label": "ContainerName",
+  "docker.containers.sortBy": "CreatedTime",
+  "docker.imageBuildContextPath": "${workspaceFolder}",
+  "docker.images.label": "RepositoryName",
+  "docker.showStartPage": false,
+  // WSL specific settings
+  "remote.WSL.fileWatcher.polling": true,
+  "remote.containers.defaultExtensions": [
+    "ms-python.python",
+    "ms-toolsai.jupyter",
+    "ms-azuretools.vscode-docker"
+  ],
+  // Updated Docker settings
+  "docker.enableIntegrationWithWSL": true,
+  "docker.host": "npipe:////./pipe/docker_engine"
 }

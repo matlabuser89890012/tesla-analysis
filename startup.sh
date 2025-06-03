@@ -70,38 +70,43 @@ if grep -q "pycodestyle<2.11.0" requirements-dev.txt; then
     echo "pycodestyle>=2.9.0,<2.11.0" >> requirements-dev.txt
 fi
 
+# Start services individually with proper checks
+start_service() {
+    local service=$1
+    echo "Starting $service service..."
+    $DOCKER_COMPOSE up --build -d $service
+    
+    # Service-specific health checks
+    case $service in
+        notebook)
+            check_service "http://localhost:8888" "Jupyter Notebook"
+            ;;
+        app)
+            check_service "http://localhost:8050" "Dashboard App"
+            ;;
+        torchserve)
+            check_service "http://localhost:8080/ping" "TorchServe"
+            ;;
+    esac
+}
+
 # Stop any existing containers
 echo "Stopping existing containers..."
 $DOCKER_COMPOSE down
 
-# Build images
-echo "Building images..."
-$DOCKER_COMPOSE build
+# Build and start each service
+echo "Starting services individually..."
+start_service notebook
+start_service app
+start_service torchserve
 
-# If build fails, try with a more relaxed approach
-if [ $? -ne 0 ]; then
-    echo "⚠️ Build failed, trying with relaxed dependency management..."
-    # Try to build with --no-cache
-    $DOCKER_COMPOSE build --no-cache
-fi
-
-# Start notebook container
-echo "Starting Jupyter Notebook container..."
-$DOCKER_COMPOSE up -d notebook
-
-# Wait and check notebook
-echo "Waiting for notebook to start..."
-sleep 10
-check_service "http://localhost:8888" "Notebook"
-
-# Start app container
-echo "Starting Dashboard app container..."
-$DOCKER_COMPOSE up -d app
-
-# Wait and check app
-echo "Waiting for app to start..."
-sleep 5
-check_service "http://localhost:8050" "Dashboard"
+# Check if GPU is available for each service
+for service in notebook app torchserve; do
+    if [ "$service" != "torchserve" ]; then  # TorchServe has its own GPU check
+        echo "Checking GPU for $service..."
+        $DOCKER_COMPOSE exec $service python3 -c "import torch; print(f'GPU available for $service:', torch.cuda.is_available())"
+    fi
+done
 
 # Final status
 echo -e "\nServices status:"
@@ -111,6 +116,8 @@ echo -e "\n========================================"
 echo "✅ All services are running!"
 echo "- Jupyter Notebook: http://localhost:8888"
 echo "- Dashboard App: http://localhost:8050"
+echo "- TorchServe Inference API: http://localhost:8080"
+echo "- TorchServe Management API: http://localhost:8081"
 echo ""
 echo "To view logs: $DOCKER_COMPOSE logs"
 echo "To stop all services: $DOCKER_COMPOSE down"
