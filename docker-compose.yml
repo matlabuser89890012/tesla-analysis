@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   notebook:
     image: tesla-stock-analysis-notebook:latest
@@ -30,7 +28,7 @@ services:
       - ./requirements-dev.txt:/app/requirements-dev.txt
       - ./environment.yml:/app/environment.yml
     command: >
-      bash -c "chmod -R 777 /app && jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''"
+      bash -c "chmod -R 777 /app && mamba install -y -c conda-forge jupyterlab && jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''"
     shm_size: "4g" # Increase shared memory size for large datasets
     cpus: "16" # Limit to 16 CPUs for the notebook container
 
@@ -58,7 +56,7 @@ services:
       - ./codes:/app/codes
       - ./environment.yml:/app/environment.yml
     command: >
-      python3 -m uvicorn codes.main:app --host 0.0.0.0 --port 8050 --reload
+      bash -c "mamba install -y -c conda-forge uvicorn && python3 -m uvicorn codes.main:app --host 0.0.0.0 --port 8050 --reload"
     shm_size: "4g" # Increase shared memory size for large datasets
     cpus: "16" # Limit to 16 CPUs for the app container
 
@@ -82,4 +80,4 @@ services:
     volumes:
       - ./codes/models:/home/model-server/model-store
     command: >
-      torchserve --start --model-store /home/model-server/model-store --models tsla=tsla-model.mar --ts-config /home/model-server/model-store/config.properties
+      bash -c "mamba install -y -c conda-forge torchserve && torchserve --start --model-store /home/model-server/model-store --models tsla=tsla-model.mar --ts-config /home/model-server/model-store/config.properties"

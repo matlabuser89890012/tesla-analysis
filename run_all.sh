@@ -6,6 +6,20 @@ echo "🔄 Setting up Tesla Stock Analysis environment..."
 command -v docker >/dev/null 2>&1 || { echo "❌ Docker is required but not installed. Please install Docker first."; exit 1; }
 command -v curl >/dev/null 2>&1 || { echo "❌ curl is required but not installed. Please install curl first."; exit 1; }
 
+# Detect mamba or conda
+detect_package_manager() {
+  if command -v mamba >/dev/null 2>&1; then
+    PKG_MGR="mamba"
+    echo "✅ Using mamba for environment management."
+  elif command -v conda >/dev/null 2>&1; then
+    PKG_MGR="conda"
+    echo "✅ Using conda for environment management."
+  else
+    echo "❌ Neither mamba nor conda found. Please install Miniconda/Anaconda or Mamba."
+    exit 1
+  fi
+}
+
 # Create a GitHub repository if needed
 setup_github_repo() {
   echo "Do you want to create a new GitHub repository for this project? (y/n)"
@@ -87,6 +101,19 @@ install_dependencies() {
   echo "✅ Dependencies installed."
 }
 
+# Environment setup (optional, if you want to automate env update here)
+setup_env() {
+  detect_package_manager
+  if [ -f environment.yml ]; then
+    echo "Updating environment from environment.yml..."
+    $PKG_MGR env update -n tesla-analysis-f -f environment.yml --prune
+  fi
+  if [ -f environment.dev.yml ]; then
+    echo "Updating environment from environment.dev.yml..."
+    $PKG_MGR env update -n tesla-analysis-f -f environment.dev.yml --prune
+  fi
+}
+
 # Start the containers
 start_containers() {
   echo "Starting Docker containers..."
@@ -115,6 +142,7 @@ echo "=========================="
 echo "This script will set up your development environment."
 echo ""
 
+setup_env
 install_dependencies
 setup_github_repo
 start_containers

@@ -70,6 +70,20 @@ if grep -q "pycodestyle<2.11.0" requirements-dev.txt; then
     echo "pycodestyle>=2.9.0,<2.11.0" >> requirements-dev.txt
 fi
 
+# Detect mamba or conda
+detect_package_manager() {
+    if command -v mamba &> /dev/null; then
+        PKG_MGR="mamba"
+        echo "✅ Using mamba for environment management."
+    elif command -v conda &> /dev/null; then
+        PKG_MGR="conda"
+        echo "✅ Using conda for environment management."
+    else
+        echo "❌ Neither mamba nor conda found. Please install Miniconda/Anaconda or Mamba."
+        exit 1
+    fi
+}
+
 # Start services individually with proper checks
 start_service() {
     local service=$1
@@ -88,6 +102,22 @@ start_service() {
             check_service "http://localhost:8080/ping" "TorchServe"
             ;;
     esac
+}
+
+# Main setup
+main() {
+    detect_package_manager
+
+    # Example: update environment if environment.yml exists
+    if [ -f environment.yml ]; then
+        echo "Updating environment from environment.yml..."
+        $PKG_MGR env update -n tesla-analysis-f -f environment.yml --prune
+    fi
+
+    if [ -f environment.dev.yml ]; then
+        echo "Updating environment from environment.dev.yml..."
+        $PKG_MGR env update -n tesla-analysis-f -f environment.dev.yml --prune
+    fi
 }
 
 # Stop any existing containers
@@ -122,3 +152,60 @@ echo ""
 echo "To view logs: $DOCKER_COMPOSE logs"
 echo "To stop all services: $DOCKER_COMPOSE down"
 echo "========================================"
+
+# Check Python version compatibility
+python_version=$(python --version | awk '{print $2}')
+if [[ ! $python_version =~ ^3\.(10|11)\. ]]; then
+    echo "❌ Unsupported Python version: $python_version. Please use Python 3.10 or 3.11."
+    exit 1
+fi
+
+# Check if requirements files exist
+if [ ! -f requirements.txt ]; then
+    echo "❌ requirements.txt not found. Please ensure the file exists in the project directory."
+    exit 1
+fi
+if [ ! -f requirements-dev.txt ]; then
+    echo "❌ requirements-dev.txt not found. Please ensure the file exists in the project directory."
+    exit 1
+fi
+
+# Check if environment files exist
+if [ ! -f environment.yml ]; then
+    echo "❌ environment.yml not found. Please ensure the file exists in the project directory."
+    exit 1
+fi
+if [ ! -f environment.dev.yml ]; then
+    echo "❌ environment.dev.yml not found. Please ensure the file exists in the project directory."
+    exit 1
+fi
+
+# Check for missing dependencies
+echo "Checking for missing dependencies..."
+missing_packages=("argon2-cffi-bindings" "brotli-python" "libexpat" "libffi" "liblzma" "libsodium" "libsqlite" "libzlib")
+for pkg in "${missing_packages[@]}"; do
+    if ! conda search "$pkg" &>/dev/null; then
+        echo "❌ Package $pkg is missing or incompatible. Please verify the channels or remove the package."
+    fi
+done
+
+# Upgrade pip, setuptools, and wheel
+echo "Upgrading pip, setuptools, and wheel..."
+pip install --upgrade pip setuptools wheel
+
+# Install requirements
+echo "Installing requirements..."
+pip install -r requirements.txt --no-cache-dir
+pip install -r requirements-dev.txt --no-cache-dir
+
+# Handle wheel-building errors
+echo "Installing problematic packages from source..."
+source_install_packages=("numpy" "pandas")
+for pkg in "${source_install_packages[@]}"; do
+    if ! pip install --no-binary :all: "$pkg"; then
+        echo "Failed to install $pkg from source. Please check logs for details."
+    fi
+done
+
+# Call main setup before Docker Compose logic
+main

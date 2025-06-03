@@ -10,100 +10,147 @@ An interactive platform for analyzing Tesla stock performance using Python, PyTo
 - GPU-accelerated model training with PyTorch
 - Containerized deployment with Docker and NVIDIA GPU support
 
-## Quick Start
+## Quick Start & Workflow
 
-### Prerequisites
+### 1. Clone the repository
 
-- Docker and Docker Compose
-- NVIDIA GPU with appropriate drivers (optional but recommended)
-- NVIDIA Container Toolkit (for GPU support)
-
-### Running the Platform
-
-#### 1. Start All Services (Recommended)
-
-The easiest way to start everything:
+Choose the command for your shell/environment:
 
 ```bash
-# On Linux/macOS
-chmod +x startup.sh
-./startup.sh
-
-# On Windows
-.\startup.sh
+git clone https://github.com/matlabuser89890012/tesla-stock-analysis.git
+cd tesla-stock-analysis
+# OR (Windows WSL)
+cd /mnt/c/Users/Hasib/Projects/tesla-stock-analysis
+# OR (Windows CMD or PowerShell)
+cd "C:\Users\Hasib\Projects\tesla-stock-analysis"
 ```
 
-#### 2. Start Individual Services
+### 2. Conda/Mamba Environment Setup
 
-To start only specific components:
+**Recommended:** Use a consistent environment name (e.g. `tesla-analysis-f`).
 
 ```bash
-# Start Jupyter Notebook
+# Using mamba (faster)
+mamba env create -f environment.yml
+mamba env update -n tesla-analysis-f -f environment.yml --prune
+mamba env update -n tesla-analysis-f -f environment.dev.yml --prune
+
+# OR using conda
+conda env create -f environment.yml
+conda env update -n tesla-analysis-f -f environment.yml --prune
+conda env update -n tesla-analysis-f -f environment.dev.yml --prune
+
+# Activate the environment
+conda activate tesla-analysis-f
+```
+
+### 3. Python Dependencies
+
+```bash
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+```
+
+### 4. Docker Compose Startup
+
+```bash
+# On Windows PowerShell
+.\startup.bat
+
+# Or manually (any shell)
 docker compose up --build notebook
-
-# Start Dashboard App
 docker compose up --build app
-
-# Start TorchServe
 docker compose up --build torchserve
 ```
 
-#### 3. Access the Services
-
-- Jupyter Notebook: [http://localhost:8888](http://localhost:8888) (no token required)
-- Dashboard App: [http://localhost:8050](http://localhost:8050)
-- TorchServe APIs:
-  - Inference API: [http://localhost:8080](http://localhost:8080)
-  - Management API: [http://localhost:8081](http://localhost:8081)
-
-## Development Setup
-
-### Local Development
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/tesla-stock-analysis.git
-   cd tesla-stock-analysis
-   ```
-
-2. Create a conda environment:
-   ```bash
-   conda env create -f environment.yml
-   conda activate tesla-analysis
-   ```
-
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt -r requirements-dev.txt
-   ```
-
-### Testing GPU Support
-
-To verify GPU support in your containers:
+### 5. GPU Check (inside container)
 
 ```bash
-# Connect to the running notebook container
 docker exec -it tesla-stock-analysis-notebook bash
-
-# Run the GPU check script
 python /app/codes/check_gpu.py
 ```
 
-## Deploying to Kubernetes
+### 6. Docker Image Tag & Push
 
-1. Push the Docker image to a registry:
-   ```bash
-   docker tag tesla-stock-analysis:latest registry.example.com/tesla-stock-analysis:latest
-   docker push registry.example.com/tesla-stock-analysis:latest
-   ```
+Replace `registry.example.com` with your registry:
 
-2. Apply the Kubernetes configuration:
-   ```bash
-   kubectl apply -f tesla-deployment.yaml
-   ```
+```bash
+docker tag tesla-stock-analysis:latest registry.example.com/tesla-stock-analysis:latest
+docker push registry.example.com/tesla-stock-analysis:latest
+```
 
-3. Access the app via the LoadBalancer IP.
+### 7. Kubernetes Deployment
+
+```bash
+kubectl apply -f tesla-deployment.yaml
+```
+
+### 8. Git Workflow
+
+```bash
+git add .
+git commit -m "Your commit message"
+git remote add origin https://github.com/matlabuser89890012/tesla-analysis.git # if not set
+git remote -v
+git pull --rebase origin main
+git push -u origin main
+```
+
+### 9. Scripts & Permissions
+
+```bash
+# For Windows PowerShell script
+.\setup.ps1
+
+# For Linux/macOS shell script
+chmod +x setup.sh
+./setup.sh
+```
 
 ## License
 
 [MIT License](LICENSE)
+
+## Install Common Libraries
+
+Use `mamba` to install frequently used libraries for data analysis, machine learning, and visualization.
+
+```bash
+# Activate environment
+conda activate tesla-analysis-f
+
+# Use mamba to install common libraries
+mamba install -c conda-forge \
+  numpy \
+  pandas \
+  matplotlib \
+  seaborn \
+  scikit-learn \
+  scipy \
+  statsmodels \
+  jupyterlab \
+  ipywidgets \
+  plotly \
+  bokeh \
+  fastapi \
+  uvicorn \
+  sqlalchemy \
+  psycopg2 \
+  pymongo \
+  requests \
+  beautifulsoup4 \
+  lxml \
+  pyyaml \
+  rich \
+  tqdm \
+  numba \
+  cudatoolkit=11.8 \
+  pytorch \
+  torchvision \
+  torchaudio \
+  pytorch-cuda=11.8 \
+  transformers \
+  datasets \
+  xgboost \
+  lightgbm
+```
